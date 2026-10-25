@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <!-- Dynamiczny, zablokowany przed przypadkowym powiększaniem viewport z safe-area -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Driver Station - Robot Dostawczy</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body unselectable="on" onselectstart="return false;" oncontextmenu="return false;">
+
+  <!-- Pełnoekranowy strumień wideo FPV -->
+  <div class="video-container">
+    <img id="camera-stream" src='http://" + WiFiAddr + ":81/stream' alt="Strumień Kamery">
+    <div class="hud-vignette"></div>
+    <div class="scanlines"></div>
+    
+    <!-- Elementy HUD / Siatka celownicza -->
+    <div class="hud-center">
+      <div class="crosshair-reticle"></div>
+      <div class="horizon-line left"></div>
+      <div class="horizon-line right"></div>
+    </div>
+  </div>
+
+  <!-- Główny kontener HUD z uwzględnieniem marginesów -->
+  <div class="hud-root">
+    <!-- Górny pasek telemetrii -->
+    <header class="hud-overlay top-hud">
+      <div class="hud-panel telemetry-panel">
+        <div class="brand">
+          <span class="live-dot"></span>
+          <span class="brand-text">DELIVERY BOT</span>
+        </div>
+        <div class="hud-metric metric-status">
+          <span class="label">STATUS:</span>
+          <span class="val green" id="stat-ping">ONLINE</span>
+        </div>
+        <div class="hud-metric metric-bat">
+          <span class="label">BAT:</span>
+          <span class="val green" id="stat-bat">24.6V</span>
+        </div>
+        <div class="hud-metric metric-time">
+          <span class="label">CZAS:</span>
+          <span class="val mono" id="hud-clock">00:00:00</span>
+        </div>
+      </div>
+
+      <div class="hud-panel status-panel">
+        <div class="status-item">
+          <div class="led active" id="led-conn"></div>
+          <span class="status-text">Link</span>
+        </div>
+        <div class="status-item">
+          <div class="led active" id="led-sens"></div>
+          <span class="status-text">Czujnik</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Powiadomienie o komendzie na środku -->
+    <div class="command-feedback" id="command-feedback">GOTOWY</div>
+
+    <!-- Dolny pulpit -->
+    <footer class="hud-overlay bottom-hud">
+      <!-- Przyciski funkcyjne -->
+      <div class="hud-panel action-panel">
+        <button class="btn btn-stop" id="btn-emergency-stop">
+          <span class="btn-icon">🛑</span>
+          <span class="btn-text">E-STOP</span>
+        </button>
+
+        <button class="btn btn-light" id="btn-toggle-light">
+          <span class="btn-icon" id="light-icon">💡</span>
+          <span class="btn-text" id="light-label">Światło</span>
+        </button>
+      </div>
+
+      <!-- Pad do sterowania robotem (automatycznie skalowany) -->
+      <div class="hud-panel dpad-panel">
+        <div class="d-pad">
+          <button class="btn d-btn btn-up" id="btn-up" data-cmd="go" aria-label="Przód">
+            ▲<span class="shortcut">W</span>
+          </button>
+          <button class="btn d-btn btn-left" id="btn-left" data-cmd="left" aria-label="Lewo">
+            ◀<span class="shortcut">A</span>
+          </button>
+          <button class="btn d-btn btn-down" id="btn-down" data-cmd="back" aria-label="Tył">
+            ▼<span class="shortcut">S</span>
+          </button>
+          <button class="btn d-btn btn-right" id="btn-right" data-cmd="right" aria-label="Prawo">
+            ▶<span class="shortcut">D</span>
+          </button>
+        </div>
+      </div>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>

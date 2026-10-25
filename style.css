@@ -1,0 +1,361 @@
+:root {
+  --bg-dark: #0a0e14;
+  --hud-bg: rgba(13, 20, 28, 0.8);
+  --hud-border: rgba(0, 240, 255, 0.35);
+  --hud-border-solid: #00f0ff;
+  --hud-text: #e2f1f8;
+  --accent-cyan: #00f0ff;
+  --accent-green: #00ff66;
+  --accent-red: #ff3344;
+  --accent-yellow: #ffcc00;
+  --panel-radius: 12px;
+
+  /* Automatycznie skalowane wymiary przycisków */
+  --dpad-btn-w: clamp(52px, 14vmin, 80px);
+  --dpad-btn-h: clamp(46px, 12vmin, 70px);
+  --action-btn-w: clamp(64px, 15vmin, 96px);
+  --action-btn-h: clamp(54px, 13vmin, 76px);
+}
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+
+/* chroni przed ucinaniem dołu na telefonach */
+body, html {
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  background-color: var(--bg-dark);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Courier New", monospace;
+  color: var(--hud-text);
+}
+
+/* KAMERA FPV */
+.video-container {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-color: #05070a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.video-container img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.hud-vignette {
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.85);
+  pointer-events: none;
+}
+
+.scanlines {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+  background-size: 100% 4px;
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* Celownik na środku ekranu */
+.hud-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.crosshair-reticle {
+  width: clamp(40px, 8vmin, 60px);
+  height: clamp(40px, 8vmin, 60px);
+  border: 1px dashed rgba(0, 240, 255, 0.45);
+  border-radius: 50%;
+  position: relative;
+}
+
+.crosshair-reticle::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 6px;
+  background: var(--accent-cyan);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--accent-cyan);
+}
+
+.horizon-line {
+  width: clamp(30px, 6vmin, 50px);
+  height: 2px;
+  background: rgba(0, 240, 255, 0.4);
+  position: absolute;
+}
+.horizon-line.left { right: clamp(50px, 10vmin, 80px); }
+.horizon-line.right { left: clamp(50px, 10vmin, 80px); }
+
+/* WARSTWA HUD Z SAFE AREA DLA SMARTFONÓW */
+.hud-root {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  /* Bezpieczne marginesy dla telefonów */
+  padding-top: max(10px, env(safe-area-inset-top));
+  padding-bottom: max(10px, env(safe-area-inset-bottom));
+  padding-left: max(12px, env(safe-area-inset-left));
+  padding-right: max(12px, env(safe-area-inset-right));
+  pointer-events: none;
+  box-sizing: border-box;
+}
+
+.hud-overlay {
+  display: flex;
+  width: 100%;
+  pointer-events: none;
+}
+
+.top-hud {
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.bottom-hud {
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 12px;
+}
+
+.hud-panel {
+  pointer-events: auto;
+  background: var(--hud-bg);
+  border: 1px solid var(--hud-border);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: var(--panel-radius);
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.45);
+}
+
+/* Górna telemetria */
+.telemetry-panel {
+  display: flex;
+  align-items: center;
+  gap: clamp(8px, 2vw, 18px);
+  padding: clamp(6px, 1.2vmin, 10px) clamp(10px, 2vmin, 16px);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 800;
+  font-size: clamp(0.75rem, 2vmin, 0.95rem);
+  letter-spacing: 1.2px;
+  color: var(--accent-cyan);
+}
+
+.live-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--accent-red);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--accent-red);
+}
+
+.hud-metric {
+  font-size: clamp(0.7rem, 1.8vmin, 0.85rem);
+  display: flex;
+  gap: 4px;
+}
+
+.hud-metric .label {
+  color: #8da2b5;
+  font-weight: 600;
+}
+
+.val.green { color: var(--accent-green); font-weight: bold; }
+.val.mono { font-family: monospace; color: var(--accent-cyan); }
+
+/* Status diod */
+.status-panel {
+  display: flex;
+  gap: clamp(8px, 1.8vw, 14px);
+  padding: clamp(6px, 1.2vmin, 10px) clamp(10px, 2vmin, 14px);
+}
+
+.status-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: clamp(0.7rem, 1.8vmin, 0.85rem);
+  font-weight: 600;
+}
+
+.led {
+  width: clamp(10px, 1.8vmin, 14px);
+  height: clamp(10px, 1.8vmin, 14px);
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background-color: #333;
+}
+
+.led.active {
+  background-color: var(--accent-green);
+  box-shadow: 0 0 8px var(--accent-green);
+}
+
+/* PRZYCISKI I KONTROLERY */
+.action-panel {
+  display: flex;
+  gap: clamp(8px, 1.5vmin, 12px);
+  padding: clamp(6px, 1.2vmin, 10px);
+}
+
+.dpad-panel {
+  padding: clamp(6px, 1.2vmin, 10px);
+}
+
+.btn {
+  border: 1px solid var(--hud-border);
+  background: rgba(15, 25, 38, 0.85);
+  color: #fff;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border-radius: 8px;
+  transition: transform 0.08s ease, background-color 0.15s;
+}
+
+.btn:active, .btn.pressed {
+  transform: scale(0.92);
+}
+
+.btn-stop {
+  width: var(--action-btn-w);
+  height: var(--action-btn-h);
+  background: rgba(220, 38, 38, 0.25);
+  border-color: var(--accent-red);
+  color: #ff9999;
+}
+
+.btn-stop:active, .btn-stop.pressed {
+  background: var(--accent-red);
+  color: white;
+  box-shadow: 0 0 16px var(--accent-red);
+}
+
+.btn-light {
+  width: var(--action-btn-w);
+  height: var(--action-btn-h);
+}
+
+.btn-light.active {
+  background: rgba(255, 204, 0, 0.25);
+  border-color: var(--accent-yellow);
+  color: var(--accent-yellow);
+  box-shadow: 0 0 12px rgba(255, 204, 0, 0.4);
+}
+
+.btn-icon { font-size: clamp(1.1rem, 2.5vmin, 1.4rem); line-height: 1; }
+.btn-text { font-size: clamp(0.6rem, 1.4vmin, 0.72rem); margin-top: 3px; }
+
+/* Dynamiczny D-PAD */
+.d-pad {
+  display: grid;
+  grid-template-columns: repeat(3, var(--dpad-btn-w));
+  grid-template-rows: repeat(2, var(--dpad-btn-h));
+  gap: clamp(4px, 1vmin, 8px);
+}
+
+.d-btn {
+  font-size: clamp(1rem, 2.8vmin, 1.3rem);
+  border-color: rgba(0, 240, 255, 0.4);
+  position: relative;
+}
+
+.d-btn:active, .d-btn.pressed {
+  background: rgba(0, 240, 255, 0.35);
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 14px rgba(0, 240, 255, 0.6);
+  color: #fff;
+}
+
+.shortcut {
+  position: absolute;
+  bottom: 3px;
+  right: 5px;
+  font-size: 0.55rem;
+  color: rgba(255, 255, 255, 0.4);
+  font-family: monospace;
+}
+
+.btn-up { grid-column: 2; grid-row: 1; }
+.btn-left { grid-column: 1; grid-row: 2; }
+.btn-down { grid-column: 2; grid-row: 2; }
+.btn-right { grid-column: 3; grid-row: 2; }
+
+/* Status komendy na środku */
+.command-feedback {
+  position: absolute;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  padding: 4px 14px;
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid rgba(0, 240, 255, 0.3);
+  border-radius: 20px;
+  font-size: clamp(0.65rem, 1.8vmin, 0.8rem);
+  font-weight: bold;
+  letter-spacing: 2px;
+  color: var(--accent-cyan);
+  pointer-events: none;
+}
+
+/* MEDIA (Pionowy smartfon vs Poziomy)*/
+@media (max-width: 500px) {
+  .metric-bat, .metric-time {
+    display: none; /* Ukryj mniej krytyczne dane w ciasnym widoku pionowym */
+  }
+  .shortcut {
+    display: none; /* Na małych ekranach dotykowych skróty klawiaturowe są zbędne */
+  }
+}
+
+@media (max-height: 480px) and (orientation: landscape) {
+  /* Ultra-kompaktowy układ gdy telefon obrócony jest poziomo */
+  .hud-root {
+    padding-top: 4px;
+    padding-bottom: 4px;
+  }
+  .brand-text { display: none; }
+  .command-feedback { top: 8%; }
+}
